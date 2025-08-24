@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta username="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OOP #3 - Abstraction, Inheritance & Polymorphism</title>
+  </head>
+  <body>
+    <h1>Sistem Login Sederhana dengan Class</h1>
+    <script>
+      // ===== Abstraction (API publik) + Encapsulation (password privat) =====
+      class Account {
+        #password; // data sensitif, privat
+
+        constructor(username, password) {
+          this.username = username; // data public
+          this.#password = password;
+        }
+
+        // Abstracrion: cara pakai dari luar cukup login/changePassword/role/getNotification/canAccess
+        login(inputPassword) {
+          return inputPassword === this.#password
+            ? "Login berhasil!"
+            : "Password salah!";
+        }
+
+        changePassword(oldPw, newPw) {
+          if (oldPw !== this.#password) return "Password lama salah!";
+          this.#password = newPw;
+          return "Password berhasil diganti!";
+        }
+
+        // Kontrak umum
+        role() {
+          return "account";
+        }
+        getNotification() {
+          return "🔔 Notifikasi umum";
+        }
+        canAccess(_feature) {
+          return false;
+        }
+      }
+
+      // ===== Inheritance + Polymorphism =====
+      class User extends Account {
+        role() {
+          return "user";
+        }
+        getNotification() {
+          return `🔔 Selamat Datang User ${this.username}`;
+        }
+        canAccess(feature) {
+          return feature === "profile";
+        }
+      }
+
+      class Admin extends Account {
+        role() {
+          return "admin";
+        }
+        getNotification() {
+          return `🔔 Selamat Datang Admin ${this.username}`;
+        }
+        canAccess(_feature) {
+          return true;
+        } // admin bisa semua
+      }
+
+      // ===== Penggunaan =====
+      const accounts = [
+        new Admin("Syahrul", "admin123"),
+        new User("Hisyam", "user123"),
+        new User("Syahid", "user456"),
+      ];
+
+      // Polymorphism in action: method sama → hasil berbeda
+      for (const acc of accounts) {
+        console.log(`[${acc.role()}] ${acc.username}`);
+        console.log("  Notification :", acc.getNotification());
+        console.log("  Akses profile?  ", acc.canAccess("profile"));
+        console.log("  Akses admin-panel?", acc.canAccess("admin-panel"));
+      }
+
+      console.log(accounts[1].login("user123"));
+      console.log(accounts[0].changePassword("admin123", "superAdmin"));
+      console.log(accounts[0].login("superAdmin"));
+    </script>
+  </body>
+</html>
